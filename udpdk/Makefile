@@ -11,28 +11,21 @@ PREFIX_INCLUDE=/usr/local/include
 PREFIX_BIN=/usr/local/bin
 UDPDK_VERSION=1.0
 
-# root is only needed to perform install
-ifneq ($(shell id -u), 0)
-ifeq ($(RTE_TARGET),)
-$(error "Please define RTE_TARGET environment variable")
-endif
-endif
-
-UDPDK_DPDK=${DEPSDIR}/dpdk/${RTE_TARGET}
-
 INIH=${DEPSDIR}/inih
+PKGCONF=pkg-config
 
 CFLAGS= -march=native -O2
 CFLAGS+= -Wall -Wno-deprecated-declarations -Werror -Wno-unused-variable
 CFLAGS+= -fno-common -finline-limit=8000
 CFLAGS+= --param inline-unit-growth=100
 CFLAGS+= --param large-function-growth=1000
+CFLAGS+= -Wno-error=stringop-truncation -Wno-error=format-truncation
 
 DPDK_CFLAGS= -DRTE_MACHINE_CPUFLAG_SSE -DRTE_MACHINE_CPUFLAG_SSE2 -DRTE_MACHINE_CPUFLAG_SSE3
 DPDK_CFLAGS+= -DRTE_MACHINE_CPUFLAG_SSSE3 -DRTE_MACHINE_CPUFLAG_SSE4_1 -DRTE_MACHINE_CPUFLAG_SSE4_2
 DPDK_CFLAGS+= -DRTE_COMPILE_TIME_CPUFLAGS=RTE_CPUFLAG_SSE,RTE_CPUFLAG_SSE2,RTE_CPUFLAG_SSE3,RTE_CPUFLAG_SSSE3,RTE_CPUFLAG_SSE4_1,RTE_CPUFLAG_SSE4_2
 
-UDPDK_CFLAGS+= -I${UDPDK_DPDK}/include
+UDPDK_CFLAGS+= $(shell $(PKGCONF) --cflags libdpdk)
 UDPDK_CFLAGS+= -I${INIH}
 UDPDK_CFLAGS+= -I. -Ilist -Ishmalloc
 

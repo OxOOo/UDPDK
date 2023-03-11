@@ -21,7 +21,7 @@
 
 #define PORT_PING   10000
 #define PORT_PONG   10001
-#define IP_PONG     "172.31.100.1"
+#define IP_PONG     "192.168.86.153"
 #define MAX_SAMPLES 100000
 
 typedef enum {PING, PONG} app_mode;
@@ -59,23 +59,29 @@ static void ping_body(void)
         }
     }
 
+    printf("$[1]\n");
+
     // Create a socket
     int sock;
     if ((sock = udpdk_socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         fprintf(stderr, "Ping: socket creation failed");
         return;
     }
+    printf("$[2]\n");
     // Bind it
     memset(&servaddr, 0, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = INADDR_ANY;
     servaddr.sin_port = htons(PORT_PING);
+    printf("$[3]\n");
     if (udpdk_bind(sock, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
         fprintf(stderr, "bind failed");
         return;
     }
+    printf("$[4]\n");
 
     while (app_alive) {
+        printf("$[5]\n");
 
         // Send ping
         if (!log_enabled)
@@ -84,8 +90,10 @@ static void ping_body(void)
         destaddr.sin_addr.s_addr = inet_addr(IP_PONG);
         destaddr.sin_port = htons(PORT_PONG);
         clock_gettime(CLOCK_REALTIME, &ts);
+        printf("$[6]\n");
         udpdk_sendto(sock, (void *)&ts, sizeof(struct timespec), 0,
                 (const struct sockaddr *) &destaddr, sizeof(destaddr));
+        printf("$[7]\n");
 
         // Get pong response
         n = udpdk_recvfrom(sock, (void *)&ts_msg, sizeof(struct timespec), 0, NULL, NULL);

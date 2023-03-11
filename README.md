@@ -89,7 +89,7 @@ From the menu, do the following:
 
 [inih](https://github.com/benhoyt/inih) is used for convenience to parse `.ini` configuration files.
 ```
-cd inih
+cd deps/inih
 meson build
 cd build
 ninja
